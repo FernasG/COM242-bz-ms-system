@@ -1,0 +1,20 @@
+version: "3.9"
+
+networks:
+  bz-network:
+    name: bz-network
+    external: true
+
+services:
+  bz-ms-system:
+    build: .
+    container_name: bz-ms-system
+    image: bz-ms-system:latest
+    env_file:
+      - .env
+    environment:
+      - TZ=America/Sao_Paulo
+    volumes:
+      - ${PWD}:/app
+    networks:
+      - bz-network
