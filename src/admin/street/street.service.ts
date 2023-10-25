@@ -12,11 +12,11 @@ export class StreetService {
   ) {
     const {name, neighborhood, qrcode_url, vacancies} = createStreetDto
 
-    const streetWithSameQrCode = this.streetRepository.findQrCode(qrcode_url)
+    // const streetWithSameQrCode = this.streetRepository.findQrCode(qrcode_url)
 
-    if (streetWithSameQrCode) {
-      throw new Error('QrCode Already Exists')
-    }
+    // if (streetWithSameQrCode) {
+    //   throw new Error('QrCode Already Exists')
+    // }
 
     const street = await this.streetRepository.create({
       name,

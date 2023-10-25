@@ -12,18 +12,6 @@ export class StreetController {
 
   @Post('create')
   async createStreet(@Body() createStreetBody: CreateStreetDto) {
-    // const {name, neighborhood, qrcode_url, vacancies} = body
-
-    // const street = await this.prisma.street.create({
-    //   data: {
-    //     id: randomUUID(),
-    //     name,
-    //     neighborhood,
-    //     qrcode_url,
-    //     vacancies,
-        
-    //   }
-    // })
 
     return this.streetService.createStreet(createStreetBody)
   }

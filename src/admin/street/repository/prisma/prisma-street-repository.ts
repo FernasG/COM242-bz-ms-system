@@ -6,11 +6,9 @@ export class PrismaStreetRepository implements StreetRepository {
   constructor(private prisma: PrismaService) {}
 
   async create(data: Prisma.StreetCreateInput): Promise<Street | null> {
-    const street = await this.prisma.street.create({
+    return await this.prisma.street.create({
       data,
     })
-
-    return street
   }
 
   async findQrCode(qrcode_url: string): Promise<Street | null> {
