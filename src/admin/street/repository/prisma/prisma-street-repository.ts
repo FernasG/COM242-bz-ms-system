@@ -1,7 +1,9 @@
 import { Prisma, Street } from "@prisma/client";
 import { StreetRepository } from "../street-repository";
 import { PrismaService } from "src/database/prisma.service";
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class PrismaStreetRepository implements StreetRepository {
   constructor(private prisma: PrismaService) {}
 
