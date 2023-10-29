@@ -1,7 +1,7 @@
-import { IsNotEmpty, IsEmpty } from "class-validator"
+import { IsNotEmpty, IsOptional } from "class-validator"
 
 export class ListStreetsDto {
-  @IsEmpty()
+  @IsOptional()
   name: string
   
   @IsNotEmpty()

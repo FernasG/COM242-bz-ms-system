@@ -44,4 +44,15 @@ export class PrismaStreetRepository implements StreetRepository {
       }
     })
   }
+
+  async update(data: Prisma.StreetUpdateInput): Promise<Street | null> {
+    const street = await this.prisma.street.update({
+      where: {
+        id: String(data.id),
+      },
+      data,
+    })
+
+    return street
+  }
 }

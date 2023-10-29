@@ -3,16 +3,17 @@ import { StreetRepository } from "src/admin/street/repository/street-repository"
 import { CreateStreetDto } from "src/admin/street/dtos/create-street-body";
 import { ListStreetsDto } from "./dtos/list-streets-body";
 import { DeleteStreetDto } from "./dtos/delete-street-body";
+import { UpdateStreetDto } from "./dtos/update-street-body";
 
 @Injectable()
 export class StreetService {
 
-  constructor(private streetRepository: StreetRepository) {}
+  constructor(private streetRepository: StreetRepository) { }
 
   async createStreet(
     createStreetDto: CreateStreetDto
   ) {
-    const {name, neighborhood, qrcode_url, vacancies} = createStreetDto
+    const { name, neighborhood, qrcode_url, vacancies } = createStreetDto
 
     const streetWithSameQrCode = await this.streetRepository.findQrCode(qrcode_url)
 
@@ -43,6 +44,22 @@ export class StreetService {
     return {
       streets,
     }
+  }
+
+  async updateStreet(
+    updateStreetDto: UpdateStreetDto
+  ) {
+    const { id, name, neighborhood, qrcode_url, vacancies } = updateStreetDto
+
+    const street = await this.streetRepository.update({
+      id,
+      name,
+      neighborhood,
+      qrcode_url,
+      vacancies
+    })
+
+    return street    
   }
 
   async deleteStreet(
