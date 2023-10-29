@@ -23,4 +23,18 @@ export class PrismaStreetRepository implements StreetRepository {
     return street
   }
 
+  async searchMany(query: string, page: number): Promise<Street[]> {
+      const streets = await this.prisma.street.findMany({
+        where: {
+          name: {
+            contains: query
+          },
+        },
+        take: 10,
+        skip: (page - 1)*20,
+      })
+
+      return streets
+  }
+
 }
