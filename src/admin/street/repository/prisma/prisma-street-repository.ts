@@ -31,7 +31,7 @@ export class PrismaStreetRepository implements StreetRepository {
           },
         },
         take: 10,
-        skip: (page - 1)*20,
+        skip: (page - 1) * 10,
       })
 
       return streets
