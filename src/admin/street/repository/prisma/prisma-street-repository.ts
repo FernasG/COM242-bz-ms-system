@@ -37,4 +37,11 @@ export class PrismaStreetRepository implements StreetRepository {
       return streets
   }
 
+  async deleteStreet(id: string): Promise<Street | null> {
+    return await this.prisma.street.delete({
+      where: {
+        id
+      }
+    })
+  }
 }

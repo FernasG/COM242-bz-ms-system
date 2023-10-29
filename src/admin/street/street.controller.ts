@@ -1,8 +1,9 @@
-import { Body, Controller, Post, Get } from "@nestjs/common";
+import { Body, Controller, Post, Get, Delete } from "@nestjs/common";
 import { PrismaService } from "src/database/prisma.service";
 import { CreateStreetDto } from "src/admin/street/dtos/create-street-body";
 import { StreetService } from "./street.service";
 import { ListStreetsDto } from "./dtos/list-streets-body";
+import { DeleteStreetDto } from "./dtos/delete-street-body";
 
 @Controller('street')
 export class StreetController {
@@ -21,5 +22,11 @@ export class StreetController {
   async listStreets(@Body() listStreetBody: ListStreetsDto) {
 
     return this.streetService.listStreets(listStreetBody)
+  }
+
+  @Delete('delete')
+  async deleteStreet(@Body() deleteStreetBody: DeleteStreetDto) {
+
+    return this.streetService.deleteStreet(deleteStreetBody)
   }
 }

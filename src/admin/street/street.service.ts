@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { StreetRepository } from "src/admin/street/repository/street-repository";
 import { CreateStreetDto } from "src/admin/street/dtos/create-street-body";
 import { ListStreetsDto } from "./dtos/list-streets-body";
+import { DeleteStreetDto } from "./dtos/delete-street-body";
 
 @Injectable()
 export class StreetService {
@@ -41,6 +42,22 @@ export class StreetService {
 
     return {
       streets,
+    }
+  }
+
+  async deleteStreet(
+    deleteStreetDto: DeleteStreetDto
+  ) {
+    const { id } = deleteStreetDto
+
+    const street = await this.streetRepository.deleteStreet(id)
+
+    if (!street) {
+      throw new Error('Street not exists')
+    }
+
+    return {
+      street,
     }
   }
 }
