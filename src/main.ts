@@ -1,7 +1,8 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { Transport, MicroserviceOptions } from '@nestjs/microservices';
+import { HttpExceptionFilter } from './exceptions/http-exception.filter';
+import { AppModule } from './app.module';
 
 async function bootstrap() {
   const RABBITMQ_URL = process.env.RABBITMQ_URL;
@@ -15,7 +16,8 @@ async function bootstrap() {
     }
   });
 
-  app.useGlobalPipes(new ValidationPipe())
+  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalFilters(new HttpExceptionFilter());
 
   await app.listen();
 }
