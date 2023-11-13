@@ -5,6 +5,7 @@ import { CreateUserDto, UpdateUserDto } from './users.interface';
 import { HttpExceptionFilter } from 'src/exceptions/http-exception.filter';
 
 @Controller()
+@UseFilters(HttpExceptionFilter)
 export class UsersController {
   constructor(private readonly usersService: UsersService) { }
 
