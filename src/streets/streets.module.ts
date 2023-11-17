@@ -5,5 +5,6 @@ import { StreetsService } from "./streets.service";
 @Module({
   imports: [],
   controllers: [StreetsController],
+  providers: [StreetsService]
 })
 export class StreetModule { }
