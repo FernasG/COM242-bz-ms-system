@@ -29,6 +29,4 @@ export class VeichlesController {
   public async remove(@Payload('id') id: string) {
     return this.vehicleService.remove(id);
   }
-
-
 }
