@@ -4,7 +4,6 @@ import { UsersService } from "src/users/users.service";
 import { VehiclesService } from "./veichles.service";
 
 @Module({
-  imports: [UsersService],
   controllers: [VeichlesController],
   providers: [VehiclesService]
 })

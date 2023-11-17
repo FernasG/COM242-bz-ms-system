@@ -5,7 +5,7 @@ import { PrismaService } from "@database";
 @Injectable()
 export class StreetsService {
 
-  constructor(private prismaService: PrismaService) { }
+  constructor(private readonly prismaService: PrismaService) { }
 
   public async createStreet(
     createStreetDto: CreateStreetDto

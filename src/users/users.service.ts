@@ -51,7 +51,7 @@ export class UsersService {
     if (cellphone) data.cellphone = cellphone;
     if (password) data.password_hash = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
 
-    return this.prismaService.user.update({ where: { id }, data });;
+    return this.prismaService.user.update({ where: { id }, data });
   }
 
   public async remove(id: string) {
