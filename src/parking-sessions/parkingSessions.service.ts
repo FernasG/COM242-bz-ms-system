@@ -14,29 +14,27 @@ export class ParkingSessionsService {
     const { entry_time, vehicle_id, street_id } = createParkingSessionDto
 
     const vehicleExists = await this.prismaService.vehicle.findFirst({ where: { id: vehicle_id } })
-
     if (!vehicleExists) throw new NotFoundException('That car does not exists')
 
     const streetExists = await this.prismaService.street.findFirst({ where: { id: street_id } })
-
     if (!streetExists) throw new NotFoundException('That street does not exists')
 
     const street = await this.prismaService.street.findFirst({ select: { vacancies: true }, where: { id: street_id } })
-
     if (street.vacancies === 0) throw new BadRequestException('That street there is not more vacancies')
 
     const vehicleAlreadyParked = await this.prismaService.parking_Session.findFirst({ where: { vehicle_id, hours: null } })
-
     if (vehicleAlreadyParked) throw new BadRequestException('That car is already parked')
 
-    const data = { entry_time, vehicle_id, street_id }
+    // const data = { entry_time, vehicle_id, street_id }
 
-    const [parkingSession, vacancies] = await this.prismaService.$transaction([
-      this.prismaService.parking_Session.create({ data }),
-      this.prismaService.street.update({ where: { id: street_id }, data: { vacancies: street.vacancies - 1 } })
-    ])
+    const total_price = await this.prismaService.street.findFirst({select: {hour_price: true}, where: {id: street_id}})
 
-    return parkingSession
+    // const [parkingSession, vacancies] = await this.prismaService.$transaction([
+    //   this.prismaService.parking_Session.create({ data }),
+    //   this.prismaService.street.update({ where: { id: street_id }, data: { vacancies: street.vacancies - 1 } })
+    // ])
+
+    // return parkingSession
   }
 
   public async listAllActivesByStreet(street_id: string) {

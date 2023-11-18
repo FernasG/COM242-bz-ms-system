@@ -1,3 +1,6 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,37 +11,25 @@ datasource db {
 }
 
 model User {
-  id            String      @id @default(uuid())
+  id            String    @id @default(uuid())
   name          String
-  email         String      @unique
+  email         String    @unique
   cellphone     String
   password_hash String
-  register      String      @unique
-  balance       Int         @default(0)
-  created_at    DateTime    @default(now())
+  register      String    @unique
+  balance       Int       @default(0)
+  created_at    DateTime  @default(now())
   updated_at    DateTime?
   deleted_at    DateTime?
-  role_id       String
-  streetId      String?
-  Blacklist     Blacklist[]
-  role          Role        @relation(fields: [role_id], references: [id])
-  streets       Street?     @relation(fields: [streetId], references: [id])
-  Vehicle       Vehicle[]
+
+  role      Role        @relation(fields: [role_id], references: [id])
+  role_id   String
+  Vehicle   Vehicle[]
+  Blacklist Blacklist[]
+  Street    Street?     @relation(fields: [streetId], references: [id])
+  streetId  String?
 
   @@map("users")
-}
-
-model Vehicle {
-  id              String            @id @default(uuid())
-  plate           String            @unique
-  model           String
-  color           String
-  manufacturer    String
-  user_id         String
-  Parking_Session Parking_Session[]
-  user            User              @relation(fields: [user_id], references: [id])
-
-  @@map("vehicles")
 }
 
 model Role {
@@ -49,24 +40,40 @@ model Role {
   @@map("roles")
 }
 
+model Vehicle {
+  id           String @id @default(uuid())
+  plate        String @unique
+  model        String
+  color        String
+  manufacturer String
+
+  user            User              @relation(fields: [user_id], references: [id])
+  user_id         String
+  Parking_Session Parking_Session[]
+
+  @@map("vehicles")
+}
+
 model Blacklist {
   id      String @id @default(uuid())
-  user_id String
   user    User   @relation(fields: [user_id], references: [id])
+  user_id String
 
   @@map("blacklist")
 }
 
 model Street {
-  id              String            @id @default(uuid())
-  name            String
-  neighborhood    String
-  qrcode_url      String            @unique
-  vacancies       Int
-  created_at      DateTime          @default(now())
-  updated_at      DateTime?
+  id           String    @id @default(uuid())
+  name         String
+  neighborhood String
+  qrcode_url   String    @unique
+  vacancies    Int
+  hour_price   Float     @default(3)
+  created_at   DateTime  @default(now())
+  updated_at   DateTime?
+
+  Users           User[]
   Parking_Session Parking_Session[]
-  users           User[]
 
   @@map("streets")
 }
@@ -76,12 +83,14 @@ model Parking_Session {
   entry_time  DateTime
   hours       Float?
   total_price Int?
+  hour_price  Float
   created_at  DateTime  @default(now())
   updated_at  DateTime?
-  street_id   String
-  vehicle_id  String
-  street      Street    @relation(fields: [street_id], references: [id])
-  vehicle     Vehicle   @relation(fields: [vehicle_id], references: [id])
+
+  street     Street  @relation(fields: [street_id], references: [id])
+  street_id  String
+  vehicle    Vehicle @relation(fields: [vehicle_id], references: [id])
+  vehicle_id String
 
   @@map("parking_sessions")
 }
