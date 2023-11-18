@@ -22,14 +22,22 @@ model User {
   updated_at    DateTime?
   deleted_at    DateTime?
 
-  role    Role   @relation(fields: [role_id], references: [id])
-  role_id String
-
+  role      Role        @relation(fields: [role_id], references: [id])
+  role_id   String
   Vehicle   Vehicle[]
   Blacklist Blacklist[]
-  Streets   Street[]
+  Street    Street?     @relation(fields: [streetId], references: [id])
+  streetId  String?
 
   @@map("users")
+}
+
+model Role {
+  id   String @id @default(uuid())
+  name String
+  User User[]
+
+  @@map("roles")
 }
 
 model Vehicle {
@@ -46,14 +54,6 @@ model Vehicle {
   @@map("vehicles")
 }
 
-model Role {
-  id   String @id @default(uuid())
-  name String
-  User User[]
-
-  @@map("roles")
-}
-
 model Blacklist {
   id      String @id @default(uuid())
   user    User   @relation(fields: [user_id], references: [id])
@@ -68,6 +68,7 @@ model Street {
   neighborhood String
   qrcode_url   String    @unique
   vacancies    Int
+  hour_price   Float     @default(3)
   created_at   DateTime  @default(now())
   updated_at   DateTime?
 
@@ -80,8 +81,9 @@ model Street {
 model Parking_Session {
   id          String    @id @default(uuid())
   entry_time  DateTime
-  hours       Float
-  total_price Int
+  hours       Float?
+  total_price Int?
+  hour_price  Float
   created_at  DateTime  @default(now())
   updated_at  DateTime?
 

@@ -7,7 +7,7 @@ import { CreateVehiclesDto, UpdateVehiclesDto } from "./vehicles.interface";
 export class VehiclesService {
   constructor(
     private readonly prismaService: PrismaService,
-    private readonly userService: UsersService
+    // private readonly userService: UsersService
   ) { }
 
   public async create(createVeichleDto: CreateVehiclesDto) {
@@ -17,7 +17,7 @@ export class VehiclesService {
 
     if (vehicleAlreadyExists) throw new BadRequestException('An vehicle with these plate already exists.');
 
-    await this.userService.findOne(user_id)
+    // await this.userService.findOne(user_id)
 
     const data = { color, manufacturer, model, plate, user_id };
     const vehicle = await this.prismaService.vehicle.create({ data })
@@ -28,7 +28,7 @@ export class VehiclesService {
   }
 
   public async findAllUserVeichles(user_id: string) {
-    await this.userService.findOne(user_id);
+    // await this.userService.findOne(user_id);
 
     const vehicles = this.prismaService.vehicle.findMany({ where: { user_id } })
 
