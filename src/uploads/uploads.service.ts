@@ -6,12 +6,16 @@ import * as path from 'path';
 
 @Injectable()
 export class UploadsService {
-  handleFile(file: any, name: string) {
+  handleFile(file: any, name?: string) {
     const uploadedFile = file.originalname;
     const uploadPath = path.join(__dirname, '..', '..', 'public', 'files');
     
     // Gere um novo nome de arquivo (você pode usar uma lógica mais avançada, se necessário)
-    const newFileName = `${Date.now()}-${uploadedFile}`;
+    let newFileName = `${Date.now()}-${uploadedFile}`;
+
+    if (name) {
+      newFileName = name;
+    }
     
     // Construa o caminho completo do novo arquivo
     const newPath = path.join(uploadPath, newFileName);
