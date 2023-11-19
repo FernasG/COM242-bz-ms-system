@@ -8,8 +8,8 @@ export class StreetsController {
   constructor(private readonly streetsService: StreetsService) { }
 
   @MessagePattern('createStreet')
-  async createStreet(@Payload() createStreetDto: CreateStreetDto) {
-    return this.streetsService.createStreet(createStreetDto)
+  async createStreet(@Payload() createStreetDto: CreateStreetDto, file: any) {
+    return this.streetsService.createStreet(createStreetDto, file)
   }
 
   @MessagePattern('findAllStreets')

@@ -5,6 +5,7 @@ import { UsersModule } from './users/users.module';
 import { VeichlesModule } from './vehicles/vehicles.module';
 import { ParkingSessionsModule } from './parking-sessions/parkingSessions.module';
 import { SchedulesModule } from './tasks-schedules/schedules.module';
+import { UploadsModule } from './uploads/uploads.module';
 
 @Module({
   imports: [
@@ -13,7 +14,8 @@ import { SchedulesModule } from './tasks-schedules/schedules.module';
     UsersModule,
     VeichlesModule,
     ParkingSessionsModule,
-    SchedulesModule
+    SchedulesModule,
+    UploadsModule
   ]
 })
 export class AppModule { }
