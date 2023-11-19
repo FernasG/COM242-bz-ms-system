@@ -5,9 +5,11 @@ import { CreateParkingSessionDto, FinishParkingSessionDto, UpdateParkingSessionD
 @Injectable()
 export class ParkingSessionsService {
   private readonly hourPrice: number
-  
-  constructor(private readonly prismaService: PrismaService) { 
-    this.hourPrice = 3
+  private readonly scoreMultiplier: number
+
+  constructor(private readonly prismaService: PrismaService) {
+    this.hourPrice = 3,
+      this.scoreMultiplier = 0.2
   }
 
   public async create(createParkingSessionDto: CreateParkingSessionDto) {
@@ -27,7 +29,7 @@ export class ParkingSessionsService {
 
     // const data = { entry_time, vehicle_id, street_id }
 
-    const total_price = await this.prismaService.street.findFirst({select: {hour_price: true}, where: {id: street_id}})
+    const total_price = await this.prismaService.street.findFirst({ select: { hour_price: true }, where: { id: street_id } })
 
     // const [parkingSession, vacancies] = await this.prismaService.$transaction([
     //   this.prismaService.parking_Session.create({ data }),
@@ -81,7 +83,16 @@ export class ParkingSessionsService {
 
     const hours = await this.calcHoursDiff(parkingSession.entry_time, timeAjusted)
 
-    return await this.prismaService.parking_Session.update({where: { id: parking_session_id }, data: {hours, total_price: hours * this.hourPrice}})
+    const user_id = await this.getUserId(parking_session_id)
+
+    const userIsInBlacklist = await this.userIsInBlacklist(user_id)
+
+    const points = this.calcGameficationPoints(hours, userIsInBlacklist)
+
+    return await this.prismaService.$transaction([
+      this.prismaService.parking_Session.update({ where: { id: parking_session_id }, data: { hours, total_price: hours * this.hourPrice } }),
+      this.prismaService.user.update({ where: { id: user_id }, data: { gamefication_points: { increments: points } } })
+    ])
   }
 
   private async ajustTimeByDay(date: Date): Promise<Date> {
@@ -91,8 +102,8 @@ export class ParkingSessionsService {
     if (dayOfWeek >= 1 && dayOfWeek <= 5 && hours > 17) {
       // Caso1: Segunda a sexta-feira, e o date2 seja maior que 17h
       return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 17, 0, 0);
-    } 
-    
+    }
+
     if (dayOfWeek === 6 && hours > 13) {
       // Caso2: Sábado e o date2 seja maior que 13h
       return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 13, 0, 0);
@@ -114,10 +125,10 @@ export class ParkingSessionsService {
       const sabadoAnterior = new Date(date);
       sabadoAnterior.setDate(date.getDate() - 1); // Vai para o sábado anterior
       sabadoAnterior.setHours(13, 0, 0, 0); // Define a hora para 13:00:00
-  
+
       return sabadoAnterior;
     }
-  
+
     // Se a data não for um domingo, retorna a data original
     return date;
   }
@@ -131,5 +142,42 @@ export class ParkingSessionsService {
     const diferencaEmHorasDecimal = diferencaEmMilissegundos / (1000 * 60 * 60);
 
     return diferencaEmHorasDecimal;
+  }
+
+  private async calcGameficationPoints(hours: number, validator: boolean) {
+    const points = (validator) ? 1 : 1 + hours * this.scoreMultiplier
+
+    return points;
+  }
+
+  private async getUserId(pkSessionId: string) {
+    const userId = await this.prismaService.parking_Session.findFirst({
+      select: {
+        vehicle: {
+          select: {
+            user: {
+              select: {
+                register: true
+              }
+            }
+          }
+        }
+      },
+      where: {
+        id: pkSessionId
+      }
+    })
+
+    return userId.vehicle.user.register;
+  }
+
+  private async userIsInBlacklist(user_id: string) {
+    const userIsInBlacklist = await this.prismaService.blacklist.findFirst({
+      where: {
+        user_id,
+      }
+    })
+
+    return (userIsInBlacklist) ? true : false
   }
 }
