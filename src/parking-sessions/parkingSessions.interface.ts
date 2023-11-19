@@ -1,4 +1,5 @@
 export class CreateParkingSessionDto {
+  hours: number;
   entry_time: Date
   street_id: string
   vehicle_id: string
