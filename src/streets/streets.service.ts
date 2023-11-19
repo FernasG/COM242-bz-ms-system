@@ -1,14 +1,19 @@
 import { ConflictException, Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
 import { CreateStreetDto, UpdateStreetDto } from "./streets.interface";
 import { PrismaService } from "@database";
+import { UploadsService } from "src/uploads/uploads.service";
 
 @Injectable()
 export class StreetsService {
 
-  constructor(private readonly prismaService: PrismaService) { }
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly uploadsService: UploadsService
+  ) { }
 
   public async createStreet(
-    createStreetDto: CreateStreetDto
+    createStreetDto: CreateStreetDto,
+    file: any
   ) {
     const { name, neighborhood, qrcode_url, vacancies } = createStreetDto
 
@@ -20,6 +25,10 @@ export class StreetsService {
     const street = await this.prismaService.street.create({ data })
 
     if (!street) throw new InternalServerErrorException('Failed to register your street.');
+
+    const uploadQrCode = await this.uploadsService.handleFile(file, (name+neighborhood));
+
+    if (!uploadQrCode) throw new InternalServerErrorException('Failed to upload your file.');
 
     return street;
 
