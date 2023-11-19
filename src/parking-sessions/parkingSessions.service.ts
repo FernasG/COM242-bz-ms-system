@@ -4,12 +4,12 @@ import { CreateParkingSessionDto, FinishParkingSessionDto, UpdateParkingSessionD
 
 @Injectable()
 export class ParkingSessionsService {
-  private readonly hourPrice: number
-  private readonly scoreMultiplier: number
+  public readonly hourPrice: number
+  public readonly scoreMultiplier: number
 
   constructor(private readonly prismaService: PrismaService) {
     this.hourPrice = 3,
-      this.scoreMultiplier = 0.2
+    this.scoreMultiplier = 0.2
   }
 
   public async create(createParkingSessionDto: CreateParkingSessionDto) {
@@ -87,12 +87,17 @@ export class ParkingSessionsService {
 
     const userIsInBlacklist = await this.userIsInBlacklist(user_id)
 
-    const points = this.calcGameficationPoints(hours, userIsInBlacklist)
+    const points = await this.calcGameficationPoints(hours, userIsInBlacklist)
 
-    return await this.prismaService.$transaction([
+    const [finish, gamefication] =  await this.prismaService.$transaction([
       this.prismaService.parking_Session.update({ where: { id: parking_session_id }, data: { hours, total_price: hours * this.hourPrice } }),
-      this.prismaService.user.update({ where: { id: user_id }, data: { gamefication_points: { increments: points } } })
+      this.prismaService.user.update({ where: { id: user_id }, data: { points_gamefication: { increment: points } } })
     ])
+
+    return {
+      finish,
+      gamefication
+    }
   }
 
   private async ajustTimeByDay(date: Date): Promise<Date> {
@@ -144,7 +149,7 @@ export class ParkingSessionsService {
     return diferencaEmHorasDecimal;
   }
 
-  private async calcGameficationPoints(hours: number, validator: boolean) {
+  private async calcGameficationPoints(hours: number, validator: boolean): Promise<number> {
     const points = (validator) ? 1 : 1 + hours * this.scoreMultiplier
 
     return points;

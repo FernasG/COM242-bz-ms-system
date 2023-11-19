@@ -4,6 +4,7 @@ import { PrismaModule } from './database/prisma.module';
 import { UsersModule } from './users/users.module';
 import { VeichlesModule } from './vehicles/vehicles.module';
 import { ParkingSessionsModule } from './parking-sessions/parkingSessions.module';
+import { SchedulesModule } from './tasks-schedules/schedules.module';
 
 @Module({
   imports: [
@@ -11,7 +12,8 @@ import { ParkingSessionsModule } from './parking-sessions/parkingSessions.module
     StreetModule,
     UsersModule,
     VeichlesModule,
-    ParkingSessionsModule
+    ParkingSessionsModule,
+    SchedulesModule
   ]
 })
 export class AppModule { }
