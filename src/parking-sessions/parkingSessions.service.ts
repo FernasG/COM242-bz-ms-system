@@ -8,35 +8,35 @@ export class ParkingSessionsService {
   public readonly scoreMultiplier: number
 
   constructor(private readonly prismaService: PrismaService) {
-    this.hourPrice = 3,
-    this.scoreMultiplier = 0.2
+    this.hourPrice = 3;
+    this.scoreMultiplier = 0.2;
   }
 
   public async create(createParkingSessionDto: CreateParkingSessionDto) {
-    const { entry_time, vehicle_id, street_id } = createParkingSessionDto
+    const { entry_time, vehicle_id, street_id, hours } = createParkingSessionDto;
 
-    const vehicleExists = await this.prismaService.vehicle.findFirst({ where: { id: vehicle_id } })
-    if (!vehicleExists) throw new NotFoundException('That car does not exists')
+    const vehicle = await this.prismaService.vehicle.findUnique({ where: { id: vehicle_id } });
 
-    const streetExists = await this.prismaService.street.findFirst({ where: { id: street_id } })
-    if (!streetExists) throw new NotFoundException('That street does not exists')
+    if (!vehicle) throw new NotFoundException('That car does not exists')
 
-    const street = await this.prismaService.street.findFirst({ select: { vacancies: true }, where: { id: street_id } })
+    const street = await this.prismaService.street.findUnique({ where: { id: street_id } });
+
+    if (!street) throw new NotFoundException('That street does not exists')
+
     if (street.vacancies === 0) throw new BadRequestException('That street there is not more vacancies')
 
-    const vehicleAlreadyParked = await this.prismaService.parking_Session.findFirst({ where: { vehicle_id, hours: null } })
-    if (vehicleAlreadyParked) throw new BadRequestException('That car is already parked')
+    const vehicleAlreadyParked = await this.prismaService.parking_Session.findFirst({ where: { vehicle_id, hours: null } });
+    if (vehicleAlreadyParked) throw new BadRequestException('That car is already parked');
 
-    // const data = { entry_time, vehicle_id, street_id }
+    const { hour_price } = street;
+    const data = { entry_time, vehicle_id, street_id, hours, hour_price, total_price: hour_price * hours };
 
-    const total_price = await this.prismaService.street.findFirst({ select: { hour_price: true }, where: { id: street_id } })
+    const [parkingSession, vacancies] = await this.prismaService.$transaction([
+      this.prismaService.parking_Session.create({ data }),
+      this.prismaService.street.update({ where: { id: street_id }, data: { vacancies: street.vacancies - 1 } })
+    ])
 
-    // const [parkingSession, vacancies] = await this.prismaService.$transaction([
-    //   this.prismaService.parking_Session.create({ data }),
-    //   this.prismaService.street.update({ where: { id: street_id }, data: { vacancies: street.vacancies - 1 } })
-    // ])
-
-    // return parkingSession
+    return parkingSession;
   }
 
   public async listAllActivesByStreet(street_id: string) {
@@ -89,7 +89,7 @@ export class ParkingSessionsService {
 
     const points = await this.calcGameficationPoints(hours, userIsInBlacklist)
 
-    const [finish, gamefication] =  await this.prismaService.$transaction([
+    const [finish, gamefication] = await this.prismaService.$transaction([
       this.prismaService.parking_Session.update({ where: { id: parking_session_id }, data: { hours, total_price: hours * this.hourPrice } }),
       this.prismaService.user.update({ where: { id: user_id }, data: { points_gamefication: { increment: points } } })
     ])
