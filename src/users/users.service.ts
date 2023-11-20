@@ -1,11 +1,15 @@
-import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { CreateUserDto, UpdateUserDto } from './users.interface';
-import { PrismaService } from '@database';
+import { BadRequestException, Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { ClientRMQ } from '@nestjs/microservices';
 import * as bcrypt from 'bcrypt';
+import { PrismaService } from '@database';
+import { CreateUserDto, UpdateUserDto } from './users.interface';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prismaService: PrismaService) { }
+  constructor(
+    private readonly prismaService: PrismaService,
+    @Inject('NOTIFICATIONS_SERVICE') private readonly clientRMQ: ClientRMQ
+  ) { }
 
   public async create(createUserDto: CreateUserDto) {
     const { name, email, cellphone, password, register } = createUserDto;
@@ -29,6 +33,8 @@ export class UsersService {
     const user = await this.prismaService.user.create({ data });
 
     if (!user) throw new InternalServerErrorException('Failed to create your account.');
+
+    this.clientRMQ.emit('notify', { destination: email });
 
     return user;
   }
