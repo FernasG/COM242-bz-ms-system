@@ -6,7 +6,7 @@ import * as path from 'path';
 
 @Injectable()
 export class UploadsService {
-  handleFile(file: any, name?: string) {
+  async handleFile(file: any, name?: string) {
     const uploadedFile = file.originalname;
     const uploadPath = path.join(__dirname, '..', '..', 'public', 'files');
     
