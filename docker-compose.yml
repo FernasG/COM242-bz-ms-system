@@ -15,6 +15,6 @@ services:
     environment:
       - TZ=America/Sao_Paulo
     volumes:
-      - ${PWD}:/app
+      - .:/app
     networks:
       - bz-network
