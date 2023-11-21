@@ -3,6 +3,8 @@ export class CreateStreetDto {
   neighborhood: string
   qrcode_url: string
   vacancies: number
+  latitude: string
+  longitude: string
 }
 
 export class UpdateStreetDto {
@@ -11,4 +13,6 @@ export class UpdateStreetDto {
   neighborhood: string
   qrcode_url: string
   vacancies: number
+  latitude: string
+  longitude: string
 }
