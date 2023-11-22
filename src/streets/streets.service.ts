@@ -15,27 +15,34 @@ export class StreetsService {
     createStreetDto: CreateStreetDto,
     file: any
   ) {
-    const { name, neighborhood, qrcode_url, vacancies, latitude, longitude } = createStreetDto
+    const { name, neighborhood, vacancies, latitude, longitude } = createStreetDto
 
-    const streetWithSameQrCode = await this.prismaService.street.findFirst({where: {qrcode_url}})
+    let { qrcode_url } = createStreetDto
 
-    if (streetWithSameQrCode) throw new ConflictException('Already have a street with that QrCode.');
-
-    const data = { name, neighborhood, qrcode_url, vacancies, latitude, longitude };
+    const data = { name, neighborhood, vacancies, latitude, longitude };
     const street = await this.prismaService.street.create({ data })
 
     if (!street) throw new InternalServerErrorException('Failed to register your street.');
+
+    qrcode_url += '\\' + street.id
+
+    const updatedStreet = await this.prismaService.street.update({where: {id: street.id}, data: {qrcode_url}})
+
+    if (!updatedStreet) throw new InternalServerErrorException('Failed to insert your qrcode_url.');
 
     const uploadQrCode = await this.uploadsService.handleFile(file, (name+neighborhood));
 
     if (!uploadQrCode) throw new InternalServerErrorException('Failed to upload your file.');
 
-    return street;
-
+    return updatedStreet;
   }
 
   public async findAllStreets() {
     return await this.prismaService.street.findMany();
+  }
+  
+  public async findStreet(id: string) {
+    return await this.prismaService.street.findFirst({where: {id}});
   }
 
   public async update(updateStreetDto: UpdateStreetDto) {
