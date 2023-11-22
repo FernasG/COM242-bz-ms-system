@@ -15,13 +15,13 @@ export class StreetsService {
     createStreetDto: CreateStreetDto,
     file: any
   ) {
-    const { name, neighborhood, qrcode_url, vacancies } = createStreetDto
+    const { name, neighborhood, qrcode_url, vacancies, latitude, longitude } = createStreetDto
 
     const streetWithSameQrCode = await this.prismaService.street.findFirst({where: {qrcode_url}})
 
     if (streetWithSameQrCode) throw new ConflictException('Already have a street with that QrCode.');
 
-    const data = { name, neighborhood, qrcode_url, vacancies };
+    const data = { name, neighborhood, qrcode_url, vacancies, latitude, longitude };
     const street = await this.prismaService.street.create({ data })
 
     if (!street) throw new InternalServerErrorException('Failed to register your street.');
@@ -39,7 +39,7 @@ export class StreetsService {
   }
 
   public async update(updateStreetDto: UpdateStreetDto) {
-    const { id, name, neighborhood, qrcode_url, vacancies } = updateStreetDto
+    const { id, name, neighborhood, qrcode_url, vacancies, latitude, longitude } = updateStreetDto
 
     const streetExists = await this.prismaService.street.findFirst({ where: { id } })
 
@@ -51,6 +51,8 @@ export class StreetsService {
     if (neighborhood) data.neighborhood = neighborhood;
     if (qrcode_url) data.qrcode_url = qrcode_url;
     if (vacancies) data.vacancies = vacancies;
+    if (longitude) data.longitude = longitude;
+    if (latitude) data.latitude = latitude;
 
     return this.prismaService.street.update({ where: { id }, data });
   }

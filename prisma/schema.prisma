@@ -70,6 +70,8 @@ model Street {
   qrcode_url   String    @unique
   vacancies    Int
   hour_price   Float     @default(3)
+  latitude     String
+  longitude    String
   created_at   DateTime  @default(now())
   updated_at   DateTime?
 
