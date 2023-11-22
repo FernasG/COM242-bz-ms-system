@@ -67,7 +67,7 @@ model Street {
   id           String    @id @default(uuid())
   name         String
   neighborhood String
-  qrcode_url   String    @unique
+  qrcode_url   String?   @unique
   vacancies    Int
   hour_price   Float     @default(3)
   latitude     String
