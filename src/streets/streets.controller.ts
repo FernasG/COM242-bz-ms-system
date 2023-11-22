@@ -16,6 +16,11 @@ export class StreetsController {
   async findAllStreets() {
     return this.streetsService.findAllStreets()
   }
+  
+  @MessagePattern('findStreet')
+  async findStreet(@Payload('id') id: string) {
+    return this.streetsService.findStreet(id)
+  }
 
   @MessagePattern('updateStreet')
   async updateStreet(@Payload() updateStreetDto: UpdateStreetDto) {

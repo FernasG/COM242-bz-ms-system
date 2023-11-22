@@ -40,6 +40,10 @@ export class StreetsService {
   public async findAllStreets() {
     return await this.prismaService.street.findMany();
   }
+  
+  public async findStreet(id: string) {
+    return await this.prismaService.street.findFirst({where: {id}});
+  }
 
   public async update(updateStreetDto: UpdateStreetDto) {
     const { id, name, neighborhood, qrcode_url, vacancies, latitude, longitude } = updateStreetDto
