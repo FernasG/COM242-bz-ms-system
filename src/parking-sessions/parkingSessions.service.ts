@@ -9,7 +9,7 @@ export class ParkingSessionsService {
 
   constructor(private readonly prismaService: PrismaService) {
     this.hourPrice = 3;
-    this.scoreMultiplier = 0.2;
+    this.scoreMultiplier = 0.5;
   }
 
   public async create(createParkingSessionDto: CreateParkingSessionDto) {
@@ -79,24 +79,28 @@ export class ParkingSessionsService {
 
     if (!parkingSession) throw new NotFoundException('Parking Session not found.');
 
-    const timeAjusted = await this.ajustTimeByDay(time);
+    const newDateTime = new Date(time);
+
+    const timeAjusted = await this.ajustTimeByDay(newDateTime);
 
     const hours = await this.calcHoursDiff(parkingSession.entry_time, timeAjusted)
 
-    const user_id = await this.getUserId(parking_session_id)
+    const id = await this.getUserId(parking_session_id)
 
-    const userIsInBlacklist = await this.userIsInBlacklist(user_id)
+    const userIsInBlacklist = await this.userIsInBlacklist(id)
+
 
     const points = await this.calcGameficationPoints(hours, userIsInBlacklist)
 
-    const [finish, gamefication] = await this.prismaService.$transaction([
-      this.prismaService.parking_Session.update({ where: { id: parking_session_id }, data: { hours, total_price: hours * this.hourPrice } }),
-      this.prismaService.user.update({ where: { id: user_id }, data: { points_gamefication: { increment: points } } })
-    ])
+    const { street_id } = await this.prismaService.parking_Session.findFirst({ where: { id: parking_session_id } })
+
+    const finish = await this.prismaService.parking_Session.update({ where: { id: parking_session_id }, data: { hours, total_price: hours * this.hourPrice } })
+    await this.prismaService.street.update({ where: { id: street_id }, data: { vacancies: { increment: 1 } } })
+    const { points_gamefication } = await this.prismaService.user.update({ where: { id }, data: { points_gamefication: { increment: points } } })
 
     return {
       finish,
-      gamefication
+      points_gamefication
     }
   }
 
@@ -150,7 +154,13 @@ export class ParkingSessionsService {
   }
 
   private async calcGameficationPoints(hours: number, validator: boolean): Promise<number> {
-    const points = (validator) ? 1 : 1 + hours * this.scoreMultiplier
+    let points = 0
+
+    if(!validator) {
+      points = (1 + hours * this.scoreMultiplier)
+    } else {
+      points = 1
+    }
 
     return points;
   }
@@ -162,7 +172,7 @@ export class ParkingSessionsService {
           select: {
             user: {
               select: {
-                register: true
+                id: true
               }
             }
           }
@@ -173,7 +183,7 @@ export class ParkingSessionsService {
       }
     })
 
-    return userId.vehicle.user.register;
+    return userId.vehicle.user.id;
   }
 
   private async userIsInBlacklist(user_id: string) {

@@ -13,5 +13,5 @@ export class UpdateParkingSessionDto {
 
 export class FinishParkingSessionDto {
   parking_session_id: string
-  time?: Date
+  time?: string
 }
