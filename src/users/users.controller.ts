@@ -1,7 +1,7 @@
 import { Controller, UseFilters } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { UsersService } from './users.service';
-import { CreateUserDto, UpdateUserDto } from './users.interface';
+import { CreateSupervisiorDto, CreateUserDto, UpdateUserDto } from './users.interface';
 import { HttpExceptionFilter } from 'src/exceptions/http-exception.filter';
 
 @Controller()
@@ -12,6 +12,11 @@ export class UsersController {
   @MessagePattern('createUser')
   public async create(@Payload() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
+  }
+  
+  @MessagePattern('createSupervisior')
+  public async createSupervisior(@Payload() createSupervisiorDto: CreateSupervisiorDto) {
+    return this.usersService.createSupervisior(createSupervisiorDto);
   }
 
   @MessagePattern('findAllUsers')

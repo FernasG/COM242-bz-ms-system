@@ -2,7 +2,7 @@ import { BadRequestException, Inject, Injectable, InternalServerErrorException, 
 import { ClientRMQ } from '@nestjs/microservices';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '@database';
-import { CreateUserDto, UpdateUserDto } from './users.interface';
+import { CreateSupervisiorDto, CreateUserDto, UpdateUserDto } from './users.interface';
 
 @Injectable()
 export class UsersService {
@@ -12,7 +12,7 @@ export class UsersService {
   ) { }
 
   public async create(createUserDto: CreateUserDto) {
-    const { name, email, cellphone, password, register, role } = createUserDto;
+    const { name, email, cellphone, password, register } = createUserDto;
 
     const userAlreadyExists = await this.prismaService.user.findFirst({ where: { OR: [{ email }, { register }] } });
 
@@ -20,8 +20,28 @@ export class UsersService {
 
     const passwordHash = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
 
-    const { id } = await this.prismaService.role.findFirst({ where: { name: role } })
-    const data = { name, email, cellphone, register, role_id: id, balance: 0, password_hash: passwordHash };
+    const role = await this.prismaService.role.findFirst({ where: { name: 'User' } })
+    const data = { name, email, cellphone, register, role_id: role.id, balance: 0, password_hash: passwordHash };
+
+    const user = await this.prismaService.user.create({ data });
+
+    if (!user) throw new InternalServerErrorException('Failed to create your account.');
+
+    this.clientRMQ.emit('notify', { destination: email });
+
+    return user;
+  }
+  public async createSupervisior(createSupervisiorDto: CreateSupervisiorDto) {
+    const { name, email, cellphone, password, register, street_id } = createSupervisiorDto;
+
+    const userAlreadyExists = await this.prismaService.user.findFirst({ where: { OR: [{ email }, { register }] } });
+
+    if (userAlreadyExists) throw new BadRequestException('An account with these credentials already exists.');
+
+    const passwordHash = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
+
+    const role = await this.prismaService.role.findFirst({ where: { name: 'Supervisor' } })
+    const data = { name, email, cellphone, register, role_id: role.id, balance: 0, password_hash: passwordHash, street_id };
 
     const user = await this.prismaService.user.create({ data });
 

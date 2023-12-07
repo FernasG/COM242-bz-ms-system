@@ -4,7 +4,15 @@ export class CreateUserDto {
   cellphone: string;
   password: string;
   register: string;
-  role: string;
+}
+
+export class CreateSupervisiorDto {
+  name: string;
+  email: string;
+  cellphone: string;
+  password: string;
+  register: string;
+  street_id: string;
 }
 
 export class UpdateUserDto {
