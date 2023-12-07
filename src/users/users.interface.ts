@@ -4,6 +4,7 @@ export class CreateUserDto {
   cellphone: string;
   password: string;
   register: string;
+  role: string;
 }
 
 export class UpdateUserDto {

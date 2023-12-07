@@ -12,7 +12,7 @@ export class UsersService {
   ) { }
 
   public async create(createUserDto: CreateUserDto) {
-    const { name, email, cellphone, password, register } = createUserDto;
+    const { name, email, cellphone, password, register, role } = createUserDto;
 
     const userAlreadyExists = await this.prismaService.user.findFirst({ where: { OR: [{ email }, { register }] } });
 
@@ -21,13 +21,6 @@ export class UsersService {
     const passwordHash = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
 
     const role = await this.prismaService.role.findFirst({ where: { name: 'User' } })
-
-
-    if (!role) {
-      // Tratar o caso em que a função de usuário não foi encontrada
-      throw new InternalServerErrorException('Role "User" not found.');
-    }
-    
     const data = { name, email, cellphone, register, role_id: role.id, balance: 0, password_hash: passwordHash };
 
     const user = await this.prismaService.user.create({ data });
