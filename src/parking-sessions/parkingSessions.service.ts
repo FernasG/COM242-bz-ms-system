@@ -44,7 +44,19 @@ export class ParkingSessionsService {
 
     if (!streetExists) throw new NotFoundException('That street does not exists')
 
-    const parkingSessions = await this.prismaService.parking_Session.findMany({ where: { street_id, hours: null } })
+    const parkingSessions = await this.prismaService.parking_Session.findMany({ 
+      select: {
+        vehicle: {
+          select : {
+            user: true
+          }
+        }
+      },
+      where: { 
+        street_id, 
+        hours: null 
+      } 
+    })
 
     return parkingSessions
   }
