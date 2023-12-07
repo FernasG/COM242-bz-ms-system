@@ -42,7 +42,20 @@ export class StreetsService {
   }
   
   public async findStreet(id: string) {
-    return await this.prismaService.street.findFirst({where: {id}});
+    return await this.prismaService.street.findFirst(
+      {
+        include: {
+          Users: {
+            include: {
+              Vehicle: true
+            }
+          },
+        },
+        where: {
+          id: id
+        }
+      }
+    );
   }
 
   public async update(updateStreetDto: UpdateStreetDto) {

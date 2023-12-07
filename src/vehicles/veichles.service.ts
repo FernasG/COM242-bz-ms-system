@@ -7,7 +7,6 @@ import { CreateVehiclesDto, UpdateVehiclesDto } from "./vehicles.interface";
 export class VehiclesService {
   constructor(
     private readonly prismaService: PrismaService,
-    // private readonly userService: UsersService
   ) { }
 
   public async create(createVeichleDto: CreateVehiclesDto) {
@@ -28,7 +27,6 @@ export class VehiclesService {
   }
 
   public async findAllUserVeichles(user_id: string) {
-    // await this.userService.findOne(user_id);
 
     const vehicles = this.prismaService.vehicle.findMany({ where: { user_id } })
 
