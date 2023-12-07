@@ -48,7 +48,11 @@ export class ParkingSessionsService {
       select: {
         vehicle: {
           select : {
-            user: true
+            user: true,
+            model: true,
+            manufacturer: true,
+            plate: true,
+            color: true,
           }
         }
       },
