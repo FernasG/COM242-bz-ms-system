@@ -20,8 +20,8 @@ export class UsersService {
 
     const passwordHash = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
 
-    const role = await this.prismaService.role.findFirst({ where: { name: 'User' } })
-    const data = { name, email, cellphone, register, role_id: role.id, balance: 0, password_hash: passwordHash };
+    const { id } = await this.prismaService.role.findFirst({ where: { name: role } })
+    const data = { name, email, cellphone, register, role_id: id, balance: 0, password_hash: passwordHash };
 
     const user = await this.prismaService.user.create({ data });
 
