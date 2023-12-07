@@ -31,8 +31,8 @@ export class UsersService {
 
     return user;
   }
-  public async createSupervisior(createSupervisiorDto: CreateSupervisiorDto) {
-    const { name, email, cellphone, password, register, street_id } = createSupervisiorDto;
+  public async createSupervisior(streetId: string, createSupervisiorDto: CreateSupervisiorDto) {
+    const { name, email, cellphone, password, register } = createSupervisiorDto;
 
     const userAlreadyExists = await this.prismaService.user.findFirst({ where: { OR: [{ email }, { register }] } });
 
@@ -41,7 +41,7 @@ export class UsersService {
     const passwordHash = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
 
     const role = await this.prismaService.role.findFirst({ where: { name: 'Supervisor' } })
-    const data = { name, email, cellphone, register, role_id: role.id, balance: 0, password_hash: passwordHash, street_id };
+    const data = { name, email, cellphone, register, role_id: role.id, balance: 0, password_hash: passwordHash, street_id: streetId };
 
     const user = await this.prismaService.user.create({ data });
 

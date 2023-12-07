@@ -12,7 +12,6 @@ export class CreateSupervisiorDto {
   cellphone: string;
   password: string;
   register: string;
-  street_id: string;
 }
 
 export class UpdateUserDto {

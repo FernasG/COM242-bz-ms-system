@@ -15,8 +15,8 @@ export class UsersController {
   }
   
   @MessagePattern('createSupervisior')
-  public async createSupervisior(@Payload() createSupervisiorDto: CreateSupervisiorDto) {
-    return this.usersService.createSupervisior(createSupervisiorDto);
+  public async createSupervisior(@Payload('streetId') streetId: string, createSupervisiorDto: CreateSupervisiorDto) {
+    return this.usersService.createSupervisior(streetId, createSupervisiorDto);
   }
 
   @MessagePattern('findAllUsers')
